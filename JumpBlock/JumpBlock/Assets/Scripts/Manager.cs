@@ -11,12 +11,15 @@ public class Manager : MonoBehaviour
 	private Rigidbody playerrb;
 	private GameObject playermodel;
 	private Animator playeranimator;
+	
 	private TextMeshProUGUI score;
 	private Animator levelAnimator;
 	private GameObject hpCanvas;
 	private GameObject[] hpCount;
+	private GameObject gameOverCanvas;
+	private Animator gameOverAnimator;
 	private Camera cam;
-	private bool camShaking = false;
+	//private bool camShaking = false;
 	
 	public GameObject enemyPrefab;
 	private List<GameObject> enemyList;
@@ -42,12 +45,16 @@ public class Manager : MonoBehaviour
 		for (int i=0; i<hpCount.Length; i++) {
 			hpCount[i] = hpCanvas.transform.Find("Heart"+(i+1)).gameObject;
 		}
+		gameOverCanvas = GameObject.Find("GameOver");
+		gameOverAnimator = gameOverCanvas.transform.Find("Panel").gameObject.GetComponent<Animator>();
+		
 		player = GameObject.Find("Player");
 		playerrb = player.GetComponent<Rigidbody>();
 		playermodel = player.transform.Find("Model").gameObject;
 		if (playermodel) {
 			playeranimator = playermodel.GetComponent<Animator>();
 		}
+		
         enemyList = new List<GameObject>();
 		level = 1;
 		totalEnemyCount = 0;
@@ -86,9 +93,11 @@ public class Manager : MonoBehaviour
     }
 	
 	void LevelUp() {
-		level += 1;
-		//levelAnimator.Play("LevelUp");
-		levelAnimator.SetTrigger("LeveledUp");
+		if (player) {
+			level += 1;
+			//levelAnimator.Play("LevelUp");
+			levelAnimator.SetTrigger("LeveledUp");
+		}
 	}
 	
 	void CheckHPCanvas() {
@@ -119,32 +128,36 @@ public class Manager : MonoBehaviour
 	}
 	
 	void CheckDamageTick() {
-		if (damageTick > 0f) {
-			damageTick -= Time.deltaTime;
-		}
-		else {
-			damageTick = 0f;
-		}
-		if (Mathf.Round((damageTick*10)%2) == 1f) {
-			playermodel.transform.localScale = new Vector3(0,0,0);
-		}
-		else {
-			playermodel.transform.localScale = new Vector3(5,5,5);
+		if (player && playermodel) {
+			if (damageTick > 0f) {
+				damageTick -= Time.deltaTime;
+			}
+			else {
+				damageTick = 0f;
+			}
+			if (Mathf.Round((damageTick*10)%2) == 1f) {
+				playermodel.transform.localScale = new Vector3(0,0,0);
+			}
+			else {
+				playermodel.transform.localScale = new Vector3(5,5,5);
+			}
 		}
 	}
 	
 	void ApplyPlayerGravity() {
-		playerrb.velocity = playerrb.velocity + new Vector3(0,gravity*Time.deltaTime,0);
+		if (player && playerrb) {
+			playerrb.velocity = playerrb.velocity + new Vector3(0,gravity*Time.deltaTime,0);
+		}
 	}
 	
 	void PlayerGrounded() {
-		if (playerrb && playerrb.velocity.y == 0f) {
+		if (player && playerrb && playerrb.velocity.y == 0f) {
 			playeranimator.SetBool("Jump", false);
 		}
 	}
 	
 	void PlayerJump() {
-		if (playerrb && playerrb.velocity.y <= 0.02f && playerrb.velocity.y >= -0.02f) {
+		if (player && playerrb && playerrb.velocity.y <= 0.02f && playerrb.velocity.y >= -0.02f) {
 			playeranimator.SetBool("Jump", true);
 			playerrb.velocity = new Vector3(0,jump,0);
 		}
@@ -162,7 +175,7 @@ public class Manager : MonoBehaviour
 		Quaternion orientation = cam.transform.rotation;
 		for (int i=0; i<10; i++) {
 			int shake = (i%2 == 0) ? 1 : -1;
-			cam.transform.eulerAngles += new Vector3(orientation.x+Random.Range(0.5f-(i/10),1f-(i/10))*shake,0f,0f);
+			cam.transform.eulerAngles += new Vector3(0f,0f,orientation.z+Random.Range(0.5f-(i/10),1f-(i/10))*shake);
 			yield return new WaitForSeconds(0.02f);
 		}
 		cam.transform.rotation = orientation;
@@ -182,6 +195,13 @@ public class Manager : MonoBehaviour
 	}
 	
 	void GameOver() {
+		if (player) {
+			Destroy(player);
+			gameOverAnimator.SetTrigger("GameOver");
+		}
+	}
+	
+	public void Restart() {
 		SceneManager.LoadScene("Scene");
 	}
 }
