@@ -65,9 +65,6 @@ public class Manager : MonoBehaviour
 
     void Update()
     {
-		if (Input.GetKey("escape")) {
-			QuitGame();
-		}
 		CheckHPCanvas();
 		CheckDamageTick();
 		if (health <= 0) {
