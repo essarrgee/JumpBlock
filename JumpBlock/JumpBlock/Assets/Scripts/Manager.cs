@@ -65,6 +65,9 @@ public class Manager : MonoBehaviour
 
     void Update()
     {
+		if (Input.GetKey("escape")) {
+			QuitGame();
+		}
 		CheckHPCanvas();
 		CheckDamageTick();
 		if (health <= 0) {
@@ -203,5 +206,9 @@ public class Manager : MonoBehaviour
 	
 	public void Restart() {
 		SceneManager.LoadScene("Scene");
+	}
+	
+	void QuitGame() {
+		Application.Quit();
 	}
 }
