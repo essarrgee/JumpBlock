@@ -157,7 +157,7 @@ public class Manager : MonoBehaviour
 	}
 	
 	void PlayerJump() {
-		if (player && playerrb && playerrb.position.y <= 1.1f) {
+		if (player && playerrb && playerrb.position.y <= 1.05f) {
 			playeranimator.SetBool("Jump", true);
 			playerrb.velocity = new Vector3(0,jump,0);
 		}
