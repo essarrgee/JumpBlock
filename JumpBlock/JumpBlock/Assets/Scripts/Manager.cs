@@ -151,13 +151,13 @@ public class Manager : MonoBehaviour
 	}
 	
 	void PlayerGrounded() {
-		if (player && playerrb && playerrb.velocity.y == 0f) {
+		if (player && playerrb && playerrb.position.y <= 1.1f) {
 			playeranimator.SetBool("Jump", false);
 		}
 	}
 	
 	void PlayerJump() {
-		if (player && playerrb && playerrb.velocity.y <= 0.02f && playerrb.velocity.y >= -0.02f) {
+		if (player && playerrb && playerrb.position.y <= 1.1f) {
 			playeranimator.SetBool("Jump", true);
 			playerrb.velocity = new Vector3(0,jump,0);
 		}
